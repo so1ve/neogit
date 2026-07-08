@@ -16,7 +16,7 @@ local fn = vim.fn
 local api = vim.api
 
 local function absolute_path(path)
-  if vim.startswith(path, "/") then
+  if vim.startswith(path, "/") or path:match("^%a:[/\\]") or vim.startswith(path, "\\\\") then
     return vim.fs.normalize(path)
   end
 
