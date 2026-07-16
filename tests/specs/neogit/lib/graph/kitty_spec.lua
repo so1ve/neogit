@@ -144,6 +144,52 @@ describe("lib.graph.kitty", function()
       assert.is_true(saw_non_purple)
     end)
 
+    it("keeps a converging branch's own color on the horizontal line leading into another branch", function()
+      -- main:    M(merge) -> C -> A
+      -- feature:      \-> F2 -> F1 -> A
+      -- F1's column bends left into A's column right before A's commit row.
+      -- The horizontal segment of that bend should stay colored like F1's own
+      -- branch (matching the corner it's attached to), not jump to A's color
+      -- a row early.
+      local result = kitty.build({
+        commit("M", "merge", "C F2"),
+        commit("C", "main", "A"),
+        commit("F2", "feat2", "F1"),
+        commit("F1", "feat1", "A"),
+        commit("A", "base"),
+      }, true)
+
+      local f1_row_idx, a_row_idx
+      for i, row in ipairs(result) do
+        if row[1].oid == "F1" then
+          f1_row_idx = i
+        elseif row[1].oid == "A" then
+          a_row_idx = i
+        end
+      end
+      assert.is_not_nil(f1_row_idx)
+      assert.is_not_nil(a_row_idx)
+
+      local f1_row = result[f1_row_idx]
+      local a_row = result[a_row_idx]
+      local converging_row = result[a_row_idx - 1]
+
+      local f1_color = f1_row[#f1_row].color:gsub("^Bold", "")
+      local a_color = a_row[1].color:gsub("^Bold", "")
+
+      assert.is_not.same(f1_color, a_color)
+
+      -- column 1 is main's own column (A's), which stays A-colored throughout;
+      -- everything to its right is F1's branch bending in, and must stay
+      -- F1-colored the whole way, including the horizontal segment itself
+      for i = 2, #converging_row do
+        local cell = converging_row[i]
+        if cell.color then
+          eq(f1_color, cell.color:gsub("^Bold", ""))
+        end
+      end
+    end)
+
     it("associates every cell in a commit's rows with that commit's oid", function()
       local result = kitty.build({
         commit("m", "merge", "b a"),
