@@ -551,7 +551,7 @@ The following events are emitted by Neogit:
   Data: `{}`
 
 • `NeogitPullComplete`
-  When: Push has finished
+  When: Pull has finished
   Data: `{}`
 
 • `NeogitFetchComplete`
