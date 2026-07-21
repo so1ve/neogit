@@ -841,11 +841,19 @@ M.n_discard = function(self)
               input.get_choice("Discard conflict by taking...", { values = choices, default = #choices })
 
             if choice == "o" then
-              git.cli.checkout.ours.files(selection.item.absolute_path).call { await = true }
-              git.status.stage { selection.item.name }
+              if selection.item.mode:sub(1, 1) == "D" then
+                git.cli.rm.files(selection.item.absolute_path).call { await = true }
+              else
+                git.cli.checkout.ours.files(selection.item.absolute_path).call { await = true }
+                git.status.stage { selection.item.name }
+              end
             elseif choice == "t" then
-              git.cli.checkout.theirs.files(selection.item.absolute_path).call { await = true }
-              git.status.stage { selection.item.name }
+              if selection.item.mode:sub(2, 2) == "D" then
+                git.cli.rm.files(selection.item.absolute_path).call { await = true }
+              else
+                git.cli.checkout.theirs.files(selection.item.absolute_path).call { await = true }
+                git.status.stage { selection.item.name }
+              end
             elseif choice == "c" then
               git.cli.checkout.merge.files(selection.item.absolute_path).call { await = true }
               git.status.stage { selection.item.name }
@@ -872,11 +880,19 @@ M.n_discard = function(self)
               input.get_choice("Discard conflict by taking...", { values = choices, default = #choices })
 
             if choice == "o" then
-              git.cli.checkout.ours.files(selection.item.absolute_path).call { await = true }
-              git.status.stage { selection.item.name }
+              if selection.item.mode:sub(1, 1) == "D" then
+                git.cli.rm.files(selection.item.absolute_path).call { await = true }
+              else
+                git.cli.checkout.ours.files(selection.item.absolute_path).call { await = true }
+                git.status.stage { selection.item.name }
+              end
             elseif choice == "t" then
-              git.cli.checkout.theirs.files(selection.item.absolute_path).call { await = true }
-              git.status.stage { selection.item.name }
+              if selection.item.mode:sub(2, 2) == "D" then
+                git.cli.rm.files(selection.item.absolute_path).call { await = true }
+              else
+                git.cli.checkout.theirs.files(selection.item.absolute_path).call { await = true }
+                git.status.stage { selection.item.name }
+              end
             elseif choice == "c" then
               git.cli.checkout.merge.files(selection.item.absolute_path).call { await = true }
               git.status.stage { selection.item.name }
